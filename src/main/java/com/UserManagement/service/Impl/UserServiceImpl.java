@@ -2,6 +2,7 @@ package com.UserManagement.service.Impl;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.UserManagement.Dto.UserDto;
 import com.UserManagement.Entity.Role;
@@ -21,9 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
@@ -66,10 +67,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto findUserById(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isPresent()){
-            return mapToUserDto(userOptional.get());
+            User user = userOptional.get();
+            List<Role> roles = user.getRoles(); // Fetch roles to avoid LazyInitializationException
+            return mapToUserDto(user);
         }
         return null;
     }
@@ -99,7 +103,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(existingUser);
     }
 
-
     @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();
@@ -121,7 +124,8 @@ public class UserServiceImpl implements UserService {
         }
         userDto.setEmail(user.getEmail());
         userDto.setAge(user.getAge());
-        userDto.setRole(user.getRoles().get(0).getName());
+        List<Role> roles = user.getRoles(); // Fetch roles to avoid LazyInitializationException
+        userDto.setRole(roles.isEmpty() ? "" : roles.get(0).getName());
         return userDto;
     }
 }

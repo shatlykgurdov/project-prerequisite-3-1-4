@@ -14,7 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
-public class springSecurity {
+public class SpringSecurity {
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -35,6 +35,7 @@ public class springSecurity {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin_users/**").hasRole("ADMIN")
                         .requestMatchers("/add/**").hasRole("ADMIN")
                         .requestMatchers("/delete/**").hasRole("ADMIN")
                         .requestMatchers("/edit/**").hasRole("ADMIN"))

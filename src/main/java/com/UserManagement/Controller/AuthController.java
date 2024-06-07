@@ -176,6 +176,14 @@ public class AuthController {
 		return "admin";
 	}
 
+	@PreAuthorize("hasAnyRole('ADMIN')")
+	@GetMapping("/admin_users")
+	public String admin_users (Model model) {
+		List<UserDto> users = userService.findAllUsers();
+		model.addAttribute("users", users);
+		return "admin_users";
+	}
+
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/edit/{id}")
